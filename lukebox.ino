@@ -25,9 +25,8 @@ void setupGpio(){
   pcf8574.pinMode(P4, INPUT);
   pcf8574.pinMode(P5, INPUT);
   pcf8574.pinMode(P6, INPUT);
-  pcf8574.pinMode(P7, OUTPUT);
   pcf8574.begin();
-  pcf8574.digitalWrite(P7, LOW); 
+  
 }
 
 void setupPlayer() {
@@ -123,6 +122,18 @@ void playTrack(int i){
   }
 }
 
+uint8_t getVolumeFromSensorValue(int sensor){
+  // sensor max val 665  -> max volume 0
+  // sensor min val 0 --> min volume 100
+  int tmp = 680 - sensor;
+  tmp = tmp*10;
+  tmp = tmp/ 75;
+  if(tmp < 0) tmp = 0;
+  if(tmp > 100) tmp = 100;
+  return tmp+10;
+   
+}
+
 void loop()
 {
     tick++;
@@ -133,28 +144,31 @@ void loop()
     
     PCF8574::DigitalInput di = pcf8574.digitalReadAll();
     
-    if(di.p0 && di.p0 != dio.p0){ Serial.println("schwarz");playTrack(1);}
-    if(di.p1 && di.p1 != dio.p1){ Serial.println("gelb");playTrack(7);}
-    if(di.p2 && di.p2 != dio.p2){ Serial.println("ornage");playTrack(6); }
+    if(di.p0 && di.p0 != dio.p0){ Serial.println("schwarz");playTrack(7);}
+    if(di.p1 && di.p1 != dio.p1){ Serial.println("orange");playTrack(6);}
+    if(di.p2 && di.p2 != dio.p2){ Serial.println("weiß");playTrack(5); }
     if(di.p3 && di.p3 != dio.p3){ Serial.println("gruen"); playTrack(4);}
-    if(di.p4 && di.p4 != dio.p4){ Serial.println("weiss"); playTrack(5);}
-    if(di.p5 && di.p5 != dio.p5){ Serial.println("rot"); playTrack(3);}
-    if(di.p6 && di.p6 != dio.p6){ Serial.println("blau"); playTrack(2);}
+    if(di.p4 && di.p4 != dio.p4){ Serial.println("rot"); playTrack(3);}
+    if(di.p5 && di.p5 != dio.p5){ Serial.println("blau"); playTrack(2);}
+    if(di.p6 && di.p6 != dio.p6){ Serial.println("gelb"); playTrack(1);}
     
     dio = di;
     
     if(tick % 10 == 0) {
      int sensorValue = analogRead(sensorPin);
-     sensorValue = (sensorValue);
-     //if(sensorValue <10) sensorValue=10;
-     if(tick % 1000 == 0) {
+     int volume = getVolumeFromSensorValue(sensorValue);
+     
+     if(tick % 200 == 0) {
       Serial.print("Tick: ");
       Serial.print(tick);
-      Serial.print(" Volume: ");
+      Serial.print(" Sensor:");
       Serial.print( sensorValue);
+      Serial.print(" Volume: ");
+      Serial.print(volume);
       Serial.println();
+      
      }
-     MP3player.setVolume(sensorValue, sensorValue);
+     MP3player.setVolume(volume, volume);
     }
     
     delay(1);
