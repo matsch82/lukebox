@@ -125,13 +125,12 @@ void playTrack(int i){
 uint8_t getVolumeFromSensorValue(int sensor){
   // sensor max val 665  -> max volume 0
   // sensor min val 0 --> min volume 100
-  int tmp = 680 - sensor;
-  tmp = tmp*10;
-  tmp = tmp/ 75;
-  if(tmp < 0) tmp = 0;
-  if(tmp > 100) tmp = 100;
-  return tmp+10;
-   
+  int tmp = sensor*100;
+  tmp = tmp/130;
+  tmp = 100 - tmp;
+  if (tmp < 20) tmp = 20;
+  if (tmp > 100) tmp = 100;
+  return tmp;
 }
 
 void loop()
