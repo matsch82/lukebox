@@ -2,6 +2,8 @@
 #include "PCF8574.h"
 
 #define NO_TRACK ((uint8_t)0xff)
+
+#define VOLUME_MAX (10) 
 PCF8574 pcf8574(0x20);
 // Bezeichnung der SD-Karte
 SdFat sd;
@@ -128,7 +130,7 @@ uint8_t getVolumeFromSensorValue(int sensor){
   int tmp = sensor*100;
   tmp = tmp/130;
   tmp = 100 - tmp;
-  if (tmp < 20) tmp = 20;
+  if (tmp < VOLUME_MAX) tmp = VOLUME_MAX;
   if (tmp > 100) tmp = 100;
   return tmp;
 }
